@@ -15,6 +15,9 @@ class ParsingError : public std::runtime_error {
     using std::runtime_error::runtime_error;
 };
 
+// Функция доступа к значениям ячеек для вычисления формул
+using SheetArgs = std::function<double(Position)>;
+
 class FormulaAST {
 public:
     explicit FormulaAST(std::unique_ptr<ASTImpl::Expr> root_expr,
@@ -23,11 +26,14 @@ public:
     FormulaAST& operator=(FormulaAST&&) = default;
     ~FormulaAST();
 
-    double Execute(/*добавьте нужные аргументы*/ args) const;
+    // ВЫЧИСЛЕНИЕ ФОРМУЛЫ: обход AST с доступом к ячейкам через SheetArgs
+    double Execute(const SheetArgs& args) const;
+    
     void PrintCells(std::ostream& out) const;
     void Print(std::ostream& out) const;
     void PrintFormula(std::ostream& out) const;
 
+    //  список всех ячеек, встречающихся в формуле
     std::forward_list<Position>& GetCells() {
         return cells_;
     }
@@ -37,12 +43,9 @@ public:
     }
 
 private:
-    std::unique_ptr<ASTImpl::Expr> root_expr_;
+    std::unique_ptr<ASTImpl::Expr> root_expr_;  // Корень дерева выражения
 
-    // physically stores cells so that they can be
-    // efficiently traversed without going through
-    // the whole AST
-    std::forward_list<Position> cells_;
+    std::forward_list<Position> cells_;  //  используется для GetReferencedCells()
 };
 
 FormulaAST ParseFormulaAST(std::istream& in);

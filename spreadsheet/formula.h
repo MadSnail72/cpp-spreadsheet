@@ -14,7 +14,7 @@
 // ячейка или ячейка с пустым текстом трактуется как число ноль.
 class FormulaInterface {
 public:
-    using Value = std::variant<double, FormulaError>;
+    using Value = std::variant<double, FormulaError>;  // Результат: число или ошибка
 
     virtual ~FormulaInterface() = default;
 
@@ -31,8 +31,7 @@ public:
     virtual std::string GetExpression() const = 0;
 
     // Возвращает список ячеек, которые непосредственно задействованы в вычислении
-    // формулы. Список отсортирован по возрастанию и не содержит повторяющихся
-    // ячеек.
+    // формулы.
     virtual std::vector<Position> GetReferencedCells() const = 0;
 };
 
